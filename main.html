@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khám phá Cơ chế Đồng thuận: Bitcoin, Ethereum & ERC-20</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fafaf9; 
+            color: #292524; 
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 40vh;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 50vh;
+            }
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .process-box {
+            background: white;
+            border: 1px solid #e7e5e4;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+            flex: 1;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .process-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #a8a29e;
+            padding: 0 0.5rem;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-indigo-200 selection:text-indigo-900">
+
+<!-- Chosen Palette: Warm Neutrals (Stone) with Brand Accents (Orange-500 for BTC, Indigo-600 for ETH) -->
+<!-- Application Structure Plan: A tab-based SPA structure was chosen. Instead of a linear, text-heavy report, users can actively navigate between core concepts (Overview, PoW, PoS, Comparison, ERC20). This modular approach allows users to consume complex technical information in digestible, themed chunks, improving comprehension and retention. -->
+<!-- Visualization & Content Choices: Report Info: Energy comparison -> Goal: Highlight difference -> Viz: Bar Chart (Chart.js) -> Interaction: Hover tooltips -> Justification: Stark visual contrast is more effective than text -> Library: Chart.js (NO SVG). Report Info: Process flow -> Goal: Explain mechanics -> Viz: CSS Flexbox process boxes -> Interaction: Reading flow -> Justification: Clean, accessible structural explanation without relying on external graphic files. -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <nav class="sticky top-0 z-50 bg-white border-b border-stone-200 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-wrap justify-between items-center py-4">
+                <div class="flex items-center">
+                    <span class="text-xl font-bold text-stone-800 tracking-tight">Crypto<span class="text-indigo-600">Architect</span></span>
+                </div>
+                <div class="flex space-x-1 sm:space-x-4 overflow-x-auto pb-2 sm:pb-0 hide-scrollbar" id="nav-buttons">
+                    <button data-target="overview" class="nav-btn active px-3 py-2 rounded-md text-sm font-medium text-indigo-700 bg-indigo-50 transition-colors whitespace-nowrap">Tổng quan</button>
+                    <button data-target="bitcoin" class="nav-btn px-3 py-2 rounded-md text-sm font-medium text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors whitespace-nowrap">Bitcoin (PoW)</button>
+                    <button data-target="ethereum" class="nav-btn px-3 py-2 rounded-md text-sm font-medium text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors whitespace-nowrap">Ethereum (PoS)</button>
+                    <button data-target="compare" class="nav-btn px-3 py-2 rounded-md text-sm font-medium text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors whitespace-nowrap">So sánh</button>
+                    <button data-target="erc20" class="nav-btn px-3 py-2 rounded-md text-sm font-medium text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors whitespace-nowrap">Chuẩn ERC-20</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        
+        <div id="overview" class="tab-content active">
+            <header class="mb-10 text-center">
+                <h1 class="text-3xl md:text-4xl font-extrabold text-stone-900 mb-4">Cơ chế Đồng thuận trong Blockchain là gì?</h1>
+                <p class="text-lg text-stone-600 max-w-3xl mx-auto">Trong một mạng lưới phi tập trung không có máy chủ trung tâm, làm thế nào để tất cả các máy tính (node) đồng ý về một phiên bản duy nhất của sự thật? Đó là nhiệm vụ của cơ chế đồng thuận.</p>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="text-3xl mb-3">&#128274;</div>
+                    <h3 class="text-xl font-bold text-stone-800 mb-2">Bảo mật</h3>
+                    <p class="text-stone-600">Ngăn chặn các tác nhân xấu thao túng dữ liệu hoặc thực hiện chi tiêu kép (double-spending).</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="text-3xl mb-3">&#129309;</div>
+                    <h3 class="text-xl font-bold text-stone-800 mb-2">Thống nhất</h3>
+                    <p class="text-stone-600">Đảm bảo mọi node trên mạng lưới đều có cùng một bản sao chính xác của sổ cái (ledger).</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="text-3xl mb-3">&#9881;&#65039;</div>
+                    <h3 class="text-xl font-bold text-stone-800 mb-2">Vận hành</h3>
+                    <p class="text-stone-600">Quy định cách thức các giao dịch mới được xác nhận và đóng gói vào các block mới.</p>
+                </div>
+            </div>
+
+            <div class="bg-indigo-50 border-l-4 border-indigo-500 p-6 rounded-r-lg">
+                <h4 class="text-lg font-bold text-indigo-900 mb-2">Hướng dẫn sử dụng</h4>
+                <p class="text-indigo-800">Sử dụng thanh điều hướng phía trên để khám phá chi tiết về hai cơ chế đồng thuận phổ biến nhất: Proof of Work (Bitcoin) và Proof of Stake (Ethereum), cũng như tìm hiểu về tiêu chuẩn token ERC-20 tạo nên hệ sinh thái DeFi.</p>
+            </div>
+        </div>
+
+        <div id="bitcoin" class="tab-content">
+            <header class="mb-8 border-b border-stone-200 pb-6">
+                <h2 class="text-3xl font-extrabold text-orange-600 mb-2">Bitcoin & Proof of Work (PoW)</h2>
+                <p class="text-lg text-stone-600">Bằng chứng Công việc - Cơ chế nguyên thủy của Blockchain.</p>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                <div>
+                    <h3 class="text-2xl font-bold text-stone-800 mb-4">Cách thức hoạt động</h3>
+                    <p class="text-stone-600 mb-4 leading-relaxed">
+                        Proof of Work yêu cầu các máy tính trên mạng lưới (gọi là "thợ đào" - miners) cạnh tranh nhau để giải một bài toán mã hóa phức tạp. Máy tính nào giải ra đầu tiên sẽ có quyền đóng gói block giao dịch mới và thêm vào blockchain.
+                    </p>
+                    <p class="text-stone-600 mb-6 leading-relaxed">
+                        Để tham gia, thợ đào phải đầu tư phần cứng máy tính mạnh mẽ và tiêu tốn một lượng điện năng khổng lồ. Công sức này chính là "bằng chứng" (proof) để chứng minh họ đã đóng góp tài nguyên, từ đó nhận được phần thưởng là Bitcoin mới.
+                    </p>
+
+                    <h4 class="font-bold text-stone-800 mb-3 text-lg">Mô hình hoạt động PoW:</h4>
+                    <div class="flex flex-col sm:flex-row items-center gap-2 bg-stone-100 p-4 rounded-lg">
+                        <div class="process-box border-orange-200">
+                            <span class="block text-2xl mb-1">&#9889;</span>
+                            <span class="text-sm font-semibold">Thợ đào sử dụng điện & máy tính</span>
+                        </div>
+                        <div class="process-arrow">&#8594;</div>
+                        <div class="process-box border-orange-200">
+                            <span class="block text-2xl mb-1">&#129518;</span>
+                            <span class="text-sm font-semibold">Cạnh tranh giải thuật toán Hash</span>
+                        </div>
+                        <div class="process-arrow">&#8594;</div>
+                        <div class="process-box border-orange-200 bg-orange-50">
+                            <span class="block text-2xl mb-1">&#128176;</span>
+                            <span class="text-sm font-semibold text-orange-800">Tạo Block & Nhận thưởng BTC</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm">
+                        <h3 class="text-xl font-bold text-green-600 mb-3 flex items-center"><span class="mr-2">&#10004;</span> Ưu điểm</h3>
+                        <ul class="list-disc pl-5 text-stone-600 space-y-2">
+                            <li><strong>Bảo mật tối đa:</strong> Rất khó để tấn công 51% vì cần chi phí phần cứng và điện năng khổng lồ.</li>
+                            <li><strong>Đã được kiểm chứng:</strong> Hoạt động ổn định trên mạng lưới Bitcoin trong hơn một thập kỷ.</li>
+                            <li><strong>Phân bổ công bằng:</strong> Bất kỳ ai có phần cứng đều có thể tham gia đào.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm">
+                        <h3 class="text-xl font-bold text-red-600 mb-3 flex items-center"><span class="mr-2">&#10008;</span> Nhược điểm</h3>
+                        <ul class="list-disc pl-5 text-stone-600 space-y-2">
+                            <li><strong>Tiêu thụ năng lượng:</strong> Gây lo ngại lớn về tác động môi trường.</li>
+                            <li><strong>Khả năng mở rộng kém:</strong> Tốc độ xử lý giao dịch chậm (khoảng 7 TPS đối với BTC).</li>
+                            <li><strong>Rủi ro tập trung:</strong> Quyền lực tập trung vào các nhóm đào (mining pools) lớn sở hữu nhiều máy móc.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="ethereum" class="tab-content">
+            <header class="mb-8 border-b border-stone-200 pb-6">
+                <div class="flex justify-between items-end">
+                    <div>
+                        <h2 class="text-3xl font-extrabold text-indigo-600 mb-2">Ethereum & Proof of Stake (PoS)</h2>
+                        <p class="text-lg text-stone-600">Bằng chứng Cổ phần - Kỷ nguyên mới sau sự kiện "The Merge".</p>
+                    </div>
+                    <span class="hidden md:inline-block bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded uppercase font-bold tracking-wider">Phiên bản hiện tại</span>
+                </div>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                <div class="order-2 lg:order-1 space-y-6">
+                    <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm">
+                        <h3 class="text-xl font-bold text-green-600 mb-3 flex items-center"><span class="mr-2">&#10004;</span> Ưu điểm</h3>
+                        <ul class="list-disc pl-5 text-stone-600 space-y-2">
+                            <li><strong>Thân thiện môi trường:</strong> Giảm ~99.9% lượng điện năng tiêu thụ so với PoW.</li>
+                            <li><strong>Rào cản tham gia phần cứng thấp:</strong> Không cần máy đào chuyên dụng, chỉ cần máy tính cơ bản và kết nối mạng.</li>
+                            <li><strong>Bảo mật kinh tế:</strong> Tấn công mạng lưới có nghĩa là kẻ tấn công sẽ mất đi số lượng lớn ETH đã stake (Slashing).</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm">
+                        <h3 class="text-xl font-bold text-red-600 mb-3 flex items-center"><span class="mr-2">&#10008;</span> Nhược điểm</h3>
+                        <ul class="list-disc pl-5 text-stone-600 space-y-2">
+                            <li><strong>Rủi ro tập trung vốn:</strong> Những người có nhiều ETH sẽ có nhiều quyền lực hơn trong mạng lưới.</li>
+                            <li><strong>Rào cản tài chính:</strong> Yêu cầu 32 ETH để trở thành validator độc lập là một con số khá lớn.</li>
+                            <li><strong>Phức tạp về mặt kỹ thuật:</strong> Thuật toán và cơ chế hoạt động phức tạp hơn PoW.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="order-1 lg:order-2">
+                    <h3 class="text-2xl font-bold text-stone-800 mb-4">Cách thức hoạt động</h3>
+                    <p class="text-stone-600 mb-4 leading-relaxed">
+                        Thay vì dùng năng lượng máy tính để giải toán, PoS yêu cầu người dùng "khóa" (stake) một lượng tiền điện tử nhất định (với Ethereum là 32 ETH) vào một hợp đồng thông minh để trở thành "Người xác thực" (Validators).
+                    </p>
+                    <p class="text-stone-600 mb-6 leading-relaxed">
+                        Thuật toán sẽ chọn ngẫu nhiên một Validator để đề xuất block mới, dựa trên số lượng coin họ đã stake. Các Validators khác sẽ kiểm tra block đó. Nếu block hợp lệ, Validator đề xuất và người kiểm tra đều nhận được phần thưởng. Nếu gian lận, số coin họ stake sẽ bị tịch thu (slashed).
+                    </p>
+
+                    <h4 class="font-bold text-stone-800 mb-3 text-lg">Mô hình hoạt động PoS:</h4>
+                    <div class="flex flex-col sm:flex-row items-center gap-2 bg-stone-100 p-4 rounded-lg">
+                        <div class="process-box border-indigo-200">
+                            <span class="block text-2xl mb-1">&#128176;</span>
+                            <span class="text-sm font-semibold">Khóa (Stake) 32 ETH</span>
+                        </div>
+                        <div class="process-arrow">&#8594;</div>
+                        <div class="process-box border-indigo-200">
+                            <span class="block text-2xl mb-1">&#127922;</span>
+                            <span class="text-sm font-semibold">Mạng lưới chọn ngẫu nhiên</span>
+                        </div>
+                        <div class="process-arrow">&#8594;</div>
+                        <div class="process-box border-indigo-200 bg-indigo-50">
+                            <span class="block text-2xl mb-1">&#128221;</span>
+                            <span class="text-sm font-semibold text-indigo-800">Xác thực & Nhận thưởng</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="compare" class="tab-content">
+            <header class="mb-8 border-b border-stone-200 pb-6 text-center">
+                <h2 class="text-3xl font-extrabold text-stone-800 mb-2">So sánh Trực quan: PoW vs PoS</h2>
+                <p class="text-lg text-stone-600">Lý do vì sao Ethereum quyết định chuyển đổi cơ chế đồng thuận.</p>
+            </header>
+
+            <div class="mb-10">
+                <h3 class="text-xl font-bold text-stone-800 mb-4 text-center">Tiêu thụ năng lượng ước tính hàng năm (TWh)</h3>
+                <p class="text-sm text-stone-500 text-center mb-6">Mức độ tiêu thụ năng lượng thể hiện sự khác biệt cốt lõi về tính bền vững.</p>
+                <div class="bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
+                    <div class="chart-container">
+                        <canvas id="energyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-stone-200 rounded-lg overflow-hidden">
+                    <thead class="bg-stone-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider">Đặc điểm</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-orange-600 uppercase tracking-wider font-bold">Proof of Work (Bitcoin)</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-indigo-600 uppercase tracking-wider font-bold">Proof of Stake (Ethereum)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-stone-200">
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-stone-900">Tài nguyên cốt lõi</td>
+                            <td class="px-6 py-4 text-sm text-stone-600">Năng lượng điện & Phần cứng (ASIC)</td>
+                            <td class="px-6 py-4 text-sm text-stone-600">Vốn (Tiền điện tử - ETH)</td>
+                        </tr>
+                        <tr class="bg-stone-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-stone-900">Người tham gia</td>
+                            <td class="px-6 py-4 text-sm text-stone-600">Thợ đào (Miners)</td>
+                            <td class="px-6 py-4 text-sm text-stone-600">Người xác thực (Validators)</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-stone-900">Chi phí Tấn công (51%)</td>
+                            <td class="px-6 py-4 text-sm text-stone-600">Chi phí mua phần cứng và trả tiền điện khổng lồ.</td>
+                            <td class="px-6 py-4 text-sm text-stone-600">Chi phí mua 51% tổng số coin đang stake (Rất đắt đỏ).</td>
+                        </tr>
+                        <tr class="bg-stone-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-stone-900">Hình phạt răn đe</td>
+                            <td class="px-6 py-4 text-sm text-stone-600">Lãng phí tiền điện và phần cứng.</td>
+                            <td class="px-6 py-4 text-sm text-stone-600">Mất số coin đã stake (Slashing).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="erc20" class="tab-content">
+            <header class="mb-8 border-b border-stone-200 pb-6">
+                <h2 class="text-3xl font-extrabold text-stone-800 mb-2">Tiêu chuẩn ERC-20</h2>
+                <p class="text-lg text-stone-600">Ngôn ngữ chung của các Token trên Ethereum.</p>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div>
+                    <h3 class="text-2xl font-bold text-stone-800 mb-4">ERC-20 là gì?</h3>
+                    <p class="text-stone-600 mb-4 leading-relaxed">
+                        <strong>E</strong>thereum <strong>R</strong>equest for <strong>C</strong>omments <strong>20</strong> là một tiêu chuẩn kỹ thuật được sử dụng cho các hợp đồng thông minh (smart contracts) trên blockchain Ethereum để tạo ra các token (tài sản kỹ thuật số).
+                    </p>
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                        <p class="text-sm text-yellow-800">
+                            <strong>Khái niệm quan trọng: Fungible (Có thể thay thế).</strong> Các token ERC-20 giống hệt nhau về chức năng và giá trị. 1 token UNI của người A hoàn toàn giống hệt 1 token UNI của người B, giống như tiền pháp định (1 tờ 100k giống 1 tờ 100k khác).
+                        </p>
+                    </div>
+                    <p class="text-stone-600 leading-relaxed">
+                        Trước khi có ERC-20, mỗi dự án tạo ra token theo cách riêng của họ, khiến các sàn giao dịch và ví lưu trữ rất khó khăn để hỗ trợ tích hợp. ERC-20 ra đời tạo ra một bộ quy tắc chung, giúp mọi thứ tương thích dễ dàng.
+                    </p>
+                </div>
+
+                <div class="bg-stone-800 text-stone-300 p-6 rounded-xl font-mono text-sm shadow-inner relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-stone-700 text-xs px-2 py-1 rounded-bl-lg">Code Logic (Minh họa)</div>
+                    <h4 class="text-white font-bold mb-3 mt-2 text-lg">Các hàm cốt lõi của ERC-20</h4>
+                    <ul class="space-y-3">
+                        <li><code class="text-green-400">totalSupply()</code><br> <span class="text-stone-400 ml-4">Trả về tổng số token đang tồn tại.</span></li>
+                        <li><code class="text-blue-400">balanceOf(account)</code><br> <span class="text-stone-400 ml-4">Kiểm tra số dư của một địa chỉ ví.</span></li>
+                        <li><code class="text-yellow-400">transfer(to, amount)</code><br> <span class="text-stone-400 ml-4">Chuyển token từ ví hiện tại sang ví khác.</span></li>
+                        <li><code class="text-purple-400">approve(spender, amount)</code><br> <span class="text-stone-400 ml-4">Cấp quyền cho một ứng dụng (DApp) dùng token.</span></li>
+                        <li><code class="text-pink-400">transferFrom(from, to, amount)</code><br> <span class="text-stone-400 ml-4">Thực thi việc chuyển sau khi đã được approve.</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm text-center">
+                <h3 class="text-xl font-bold text-stone-800 mb-4">Tại sao ERC-20 lại quan trọng?</h3>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <div class="px-4 py-2 bg-stone-100 rounded-full text-stone-700 font-medium text-sm">Khởi nguồn của ICO & DeFi</div>
+                    <div class="px-4 py-2 bg-stone-100 rounded-full text-stone-700 font-medium text-sm">Tính thanh khoản cao</div>
+                    <div class="px-4 py-2 bg-stone-100 rounded-full text-stone-700 font-medium text-sm">Dễ dàng tích hợp lên Sàn giao dịch & Ví</div>
+                    <div class="px-4 py-2 bg-stone-100 rounded-full text-stone-700 font-medium text-sm">Stablecoins (USDT, USDC) đều dùng chuẩn này</div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-stone-100 border-t border-stone-200 py-8 mt-12">
+        <div class="max-w-6xl mx-auto px-4 text-center text-stone-500 text-sm">
+            <p>Báo cáo Phân tích Trực quan - Chuyên đề Công nghệ Blockchain.</p>
+        </div>
+    </footer>
+
+    <script>
+        const navButtons = document.querySelectorAll('.nav-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        let chartInstance = null;
+        let chartRendered = false;
+
+        function switchTab(targetId) {
+            navButtons.forEach(btn => {
+                if(btn.dataset.target === targetId) {
+                    btn.classList.add('text-indigo-700', 'bg-indigo-50');
+                    btn.classList.remove('text-stone-600', 'hover:text-stone-900', 'hover:bg-stone-100');
+                } else {
+                    btn.classList.remove('text-indigo-700', 'bg-indigo-50');
+                    btn.classList.add('text-stone-600', 'hover:text-stone-900', 'hover:bg-stone-100');
+                }
+            });
+
+            tabContents.forEach(content => {
+                if(content.id === targetId) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+
+            if(targetId === 'compare' && !chartRendered) {
+                renderChart();
+                chartRendered = true;
+            }
+        }
+
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                switchTab(button.dataset.target);
+            });
+        });
+
+        function renderChart() {
+            const ctx = document.getElementById('energyChart').getContext('2d');
+            
+            const data = {
+                labels: ['Bitcoin (PoW)', 'Ethereum (PoW - Cũ)', 'Ethereum (PoS - Hiện tại)'],
+                datasets: [{
+                    label: 'Tiêu thụ năng lượng (TWh/năm)',
+                    data: [130, 78, 0.01], 
+                    backgroundColor: [
+                        'rgba(249, 115, 22, 0.7)', 
+                        'rgba(99, 102, 241, 0.3)', 
+                        'rgba(79, 70, 229, 0.8)'   
+                    ],
+                    borderColor: [
+                        'rgb(249, 115, 22)',
+                        'rgb(99, 102, 241)',
+                        'rgb(67, 56, 202)'
+                    ],
+                    borderWidth: 1
+                }]
+            };
+
+            const config = {
+                type: 'bar',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y + ' TWh';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'TWh / Năm'
+                            }
+                        }
+                    }
+                }
+            };
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+            chartInstance = new Chart(ctx, config);
+        }
+    </script>
+</body>
+</html>
